@@ -6,7 +6,7 @@ on:
 
 jobs:
   check_changes:
-    if: contains(github.event.pull_request.labels.*.name, 'Calendar proposal') || contains(github.event.pull_request.labels.*.name, 'Calendar proposal')
+    if: contains(github.event.pull_request.labels.*.name, 'Calendar proposal') || contains(github.event.pull_request.labels.*.name, 'OKR proposal')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
