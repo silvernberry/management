@@ -6,7 +6,7 @@ on:
 
 jobs:
   check_changes:
-    if: contains(github.event.pull_request.labels.*.name, 'Salary proposal')
+    if: contains(github.event.pull_request.labels.*.name, 'Salary proposal') || contains(github.event.pull_request.labels.*.name, 'Rule ammendment proposal')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
