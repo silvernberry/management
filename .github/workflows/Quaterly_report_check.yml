@@ -26,10 +26,16 @@ jobs:
         run: |
           if [ -z "${{ steps.get_changed_files.outputs.CHANGED_FILES }}" ]; then
             echo "No changes made to Quarterly Reports folder."
+            exit 1
           else
             echo "Changes detected in Quarterly Reports folder."
             while read -r file; do
               filename=$(basename "$file")
-              echo "$filename"
+              if [[ $filename =~ ^Q(1|2|3|4)_(202[0-9])\.md$ ]]; then
+                echo "$filename"
+              else
+                echo "Invalid filename format: $filename"
+                exit 1
+              fi
             done <<< "${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
           fi
