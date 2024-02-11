@@ -29,9 +29,11 @@ jobs:
             exit 1
           else
             echo "Changes detected in Quarterly Reports folder."
+            current_month=$(date +"%-m")
+            current_year=$(date +"%Y")
             while read -r file; do
               filename=$(basename "$file")
-              if [[ $filename =~ ^Q(1|2|3|4)_(202[0-9])\.md$ ]]; then
+              if [[ $filename =~ ^Q$(( ($current_month - 1) / 3 + 1 ))_${current_year}\.md$ ]]; then
                 echo "$filename"
               else
                 echo "Invalid filename format: $filename"
