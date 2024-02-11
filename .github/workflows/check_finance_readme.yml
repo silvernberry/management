@@ -1,0 +1,35 @@
+name: Check README Changes
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, edited, labeled]
+    paths:
+      - 'finance/README.md'
+
+jobs:
+  check_changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Get changed files in pull request
+        id: get_changed_files
+        run: |
+          changed_files=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+          -X GET ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+          | jq -r '.[] | select(.filename | contains("finance/README.md")) | .filename')
+          echo "::set-output name=CHANGED_FILES::$changed_files"
+
+      - name: Check for README changes
+        run: |
+          if [ -z "${{ steps.get_changed_files.outputs.CHANGED_FILES }}" ]; then
+            echo "No changes made to finance/README.md file."
+          else
+            echo "Changes detected in finance/README.md file."
+            echo "${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
+          fi
