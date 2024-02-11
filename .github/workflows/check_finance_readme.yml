@@ -3,8 +3,8 @@ name: Check README Changes
 on:
   pull_request:
     branches:
-      - main
-    types: [opened, synchronize, reopened, edited, labeled]
+      - test
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
     paths:
       - 'finance/README.md'
 
