@@ -8,7 +8,7 @@
 - **Structure:** Section 8 Company, India
 - **CIN Number:** TBD
 
-### Quick Links 
+### Quick Links nlnl
 
 - [Proposals Request Tutorial](https://youtube.com)  for Non-Technical Individuals.
 - [Monthly Calendar](/calendar/): Access monthly calendars for events and activities.
