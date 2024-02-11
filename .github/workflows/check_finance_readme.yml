@@ -26,6 +26,7 @@ jobs:
         run: |
           if [ -z "${{ steps.get_changed_files.outputs.CHANGED_FILES }}" ]; then
             echo "No changes made to finance/README.md file."
+            exit 1
           else
             echo "Changes detected in finance/README.md file."
             echo "${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
