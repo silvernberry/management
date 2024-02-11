@@ -1,0 +1,37 @@
+name: Check Management README.md Changes
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+
+jobs:
+  check_changes:
+    if: contains(github.event.pull_request.labels.*.name, 'Calendar proposal') || contains(github.event.pull_request.labels.*.name, 'OKR proposal')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Get changed files in pull request
+        id: get_changed_files
+        run: |
+          calendar_files=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+          -X GET ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+          | jq -r '.[] | select(.filename | contains("calendar/") and (.status == "added" or .status == "modified")) | .filename')
+
+          okr_files=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+          -X GET ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+          | jq -r '.[] | select(.filename | contains("monthly_OKR/") and (.status == "added" or .status == "modified")) | .filename')
+
+          echo "::set-output name=CALENDAR_FILES::$calendar_files"
+          echo "::set-output name=OKR_FILES::$okr_files"
+
+      - name: Check for changes in 'calendar' directory
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'Calendar proposal') && steps.get_changed_files.outputs.CALENDAR_FILES == '' }}
+        run: exit 1
+
+      - name: Check for changes in 'monthly_OKR' directory
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'OKR proposal') && steps.get_changed_files.outputs.OKR_FILES == '' }}
+        run: exit 1
