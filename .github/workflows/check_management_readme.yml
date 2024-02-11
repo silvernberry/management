@@ -1,4 +1,4 @@
-name: Check README Changes
+name: Check Management README.md Changes
 
 on:
   pull_request:
