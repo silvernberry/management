@@ -1,4 +1,4 @@
-name: Check Management README.md Changes
+name: Check Proposal Changes
 
 on:
   pull_request:
@@ -6,7 +6,9 @@ on:
 
 jobs:
   check_changes:
-    if: contains(github.event.pull_request.labels.*.name, 'Calendar proposal') || contains(github.event.pull_request.labels.*.name, 'OKR proposal')
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'Calendar proposal') ||
+      contains(github.event.pull_request.labels.*.name, 'OKR proposal')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -17,21 +19,32 @@ jobs:
       - name: Get changed files in pull request
         id: get_changed_files
         run: |
-          calendar_files=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+          changed_files=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
           -X GET ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
-          | jq -r '.[] | select(.filename | contains("calender/")) | .filename')
+          | jq -r '.[] | .filename')
+          echo "::set-output name=CHANGED_FILES::$changed_files"
 
-          okr_files=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
-          -X GET ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
-          | jq -r '.[] | select(.filename | contains("monthly_OKR/")) | .filename')
-
-          echo "::set-output name=CALENDAR_FILES::$calendar_files"
-          echo "::set-output name=OKR_FILES::$okr_files"
-
-      - name: Check for changes in 'calendar' directory
-        if: ${{ contains(github.event.pull_request.labels.*.name, 'Calendar proposal') && steps.get_changed_files.outputs.CALENDAR_FILES == '' }}
-        run: exit 1
-
-      - name: Check for changes in 'monthly_OKR' directory
-        if: ${{ contains(github.event.pull_request.labels.*.name, 'OKR proposal') && steps.get_changed_files.outputs.OKR_FILES == '' }}
-        run: exit 1
+      - name: Check for changes based on labels
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            case "${{ steps.get_changed_files.outputs.CHANGED_FILES }}" in
+              *"calender"*)
+                echo "Changes detected in Calendar proposal folder."
+                while read -r file; do
+                  filename=$(basename "$file")
+                  echo "$filename"
+                done <<< "${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
+                ;;
+              *"monthly_OKR"*)
+                echo "Changes detected in OKR proposal folder."
+                while read -r file; do
+                  filename=$(basename "$file")
+                  echo "$filename"
+                done <<< "${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
+                ;;
+              *)
+                echo "No relevant changes detected."
+                exit 1
+                ;;
+            esac
+          fi
