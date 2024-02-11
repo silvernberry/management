@@ -1,4 +1,4 @@
-name: Check Proposal Changes
+name: Check File format
 
 on:
   pull_request:
@@ -6,9 +6,7 @@ on:
 
 jobs:
   check_changes:
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'Calendar proposal') ||
-      contains(github.event.pull_request.labels.*.name, 'OKR proposal')
+    if: contains(github.event.pull_request.labels.*.name, 'Calendar proposal', 'OKR proposal')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -19,32 +17,26 @@ jobs:
       - name: Get changed files in pull request
         id: get_changed_files
         run: |
+          label_name=$(echo "${{ github.event.pull_request.labels.*.name }}" | tr -d '\n')
+          if [ "$label_name" == "Calendar proposal" ]; then
+            directory="calender"
+          elif [ "$label_name" == "OKR proposal" ]; then
+            directory="monthly_OKR"
+          fi
           changed_files=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
           -X GET ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
-          | jq -r '.[] | .filename')
+          | jq -r --arg directory "$directory" '.[] | select(.filename | contains($directory)) | .filename')
           echo "::set-output name=CHANGED_FILES::$changed_files"
 
-      - name: Check for changes based on labels
+      - name: Check for Proposal Changes
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            case "${{ steps.get_changed_files.outputs.CHANGED_FILES }}" in
-              *"calender"*)
-                echo "Changes detected in Calendar proposal folder."
-                while read -r file; do
-                  filename=$(basename "$file")
-                  echo "$filename"
-                done <<< "${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
-                ;;
-              *"monthly_OKR"*)
-                echo "Changes detected in OKR proposal folder."
-                while read -r file; do
-                  filename=$(basename "$file")
-                  echo "$filename"
-                done <<< "${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
-                ;;
-              *)
-                echo "No relevant changes detected."
-                exit 1
-                ;;
-            esac
+          if [ -z "${{ steps.get_changed_files.outputs.CHANGED_FILES }}" ]; then
+            echo "No changes made to the $directory directory."
+            exit 1
+          else
+            echo "Changes detected in the $directory directory."
+            while read -r file; do
+              filename=$(basename "$file")
+              echo "$filename"
+            done <<< "${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
           fi
