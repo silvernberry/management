@@ -6,7 +6,7 @@ on:
 
 jobs:
   check_changes:
-    if: ${{ github.event.label.name == 'Income proposal' }}
+    if: ${{ github.event.pull_request.label.name == 'Income proposal' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
