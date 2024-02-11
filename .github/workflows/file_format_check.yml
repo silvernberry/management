@@ -1,4 +1,4 @@
-name: File format check
+name: Check Management README.md Changes
 
 on:
   pull_request:
@@ -19,11 +19,11 @@ jobs:
         run: |
           calendar_files=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
           -X GET ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
-          | jq -r '.[] | select(.filename | contains("calender/") and (.status == "added" or .status == "modified")) | .filename')
+          | jq -r '.[] | select(.filename | contains("calender/")) | .filename')
 
           okr_files=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
           -X GET ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
-          | jq -r '.[] | select(.filename | contains("monthly_OKR/") and (.status == "added" or .status == "modified")) | .filename')
+          | jq -r '.[] | select(.filename | contains("monthly_OKR/")) | .filename')
 
           echo "::set-output name=CALENDAR_FILES::$calendar_files"
           echo "::set-output name=OKR_FILES::$okr_files"
