@@ -3,8 +3,6 @@ name: Check README Changes
 on:
   pull_request:
     types: [opened, synchronize, reopened, edited, labeled, unlabeled]
-    paths:
-      - 'finance/README.md'
 
 jobs:
   check_changes:
