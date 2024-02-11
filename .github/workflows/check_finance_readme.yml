@@ -1,4 +1,4 @@
-name: Check README Changes
+name: Check finance README Changes
 
 on:
   pull_request:
