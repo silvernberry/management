@@ -30,6 +30,8 @@ jobs:
             directory="finance/treasury_proposals"
           elif [[ "$label_names" == *"Income proposal"* ]]; then
             directory="finance/income_proposals"
+          elif [[ "$label_names" == *"Salary proposal"* ]]; then
+            directory="finance/other_condition"
           fi
           echo "Directory: $directory"
           echo "::set-output name=DIRECTORY::$directory"
