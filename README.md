@@ -7,7 +7,7 @@
 - **Name:** Auguth Research Foundation (Non-Profit Organization)
 - **Structure:** Section 8 Company, India
 - **CIN Number:** TBD
-
+mnk
 ### Quick Links 
 
 - [Proposals Request Tutorial](https://youtube.com)  for Non-Technical Individuals.
