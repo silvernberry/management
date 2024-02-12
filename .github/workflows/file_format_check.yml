@@ -6,6 +6,7 @@ on:
 
 jobs:
   check_changes:
+    if: contains(github.event.pull_request.labels.*.name, 'Calendar proposal') || contains(github.event.pull_request.labels.*.name, 'OKR proposal')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -50,13 +51,13 @@ jobs:
             exit 1
           else
             echo "Changes detected in the $directory directory."
+            current_month_year=$(date +"%m_%Y")
             while read -r file; do
               filename=$(basename "$file")
-              echo "Checking file: $filename"
-              current_month_year=$(date +"%m_%Y")
-              if [[ "$filename" != *"${current_month_year}.md" ]]; then
-                echo "Error: File format incorrect. Expected format: ${current_month_year}.md"
+              if [[ "$filename" != "$current_month_year.md" ]]; then
+                echo "File $filename format is incorrect."
                 exit 1
               fi
+              echo "$filename"
             done <<< "$changed_files"
           fi
