@@ -11,7 +11,7 @@
 ### Quick Links 
 
 - [Proposals Request Tutorial](https://youtube.com)  for Non-Technical Individuals.
-- [Monthly Calendar](/calendar/): Access monthly calendars for events and activities.
+- [Monthly Calendar](/calendar/): Access monthl mkn kn y calendars for events and activities.
 - [Monthly OKR](/monthly_OKR/): View monthly Objectives and Key Results (OKRs).
 - [Finance Related](/finance): Explore finance-related documents and proposals.
   - [Income Proposals](/finance/income_proposals): Submit or review income-related proposals.
