@@ -27,9 +27,11 @@ jobs:
           -X GET "${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
           | jq -r '.[] | select(.filename | contains("'"$directory"'")) | .filename')
           echo "::set-output name=CHANGED_FILES::$changed_files"
+          echo "::set-output name=DIRECTORY::$directory"
 
       - name: Check for Proposal Changes
         run: |
+          directory="${{ steps.get_changed_files.outputs.DIRECTORY }}"
           changed_files="${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
           if [ -z "$changed_files" ]; then
             echo "No changes made to the $directory directory."
