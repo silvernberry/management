@@ -18,12 +18,12 @@ jobs:
         id: get_directory
         run: |
           label_name=$(echo "${{ github.event.pull_request.labels.*.name }}" | tr -d '\n')
+          echo "Label name: $label_name"
           if [ "$label_name" == "Calendar proposal" ]; then
             directory="calender"
           elif [ "$label_name" == "OKR proposal" ]; then
             directory="monthly_OKR"
           fi
-          echo "Label name: $label_name"
           echo "Directory: $directory"
           echo "::set-output name=DIRECTORY::$directory"
 
