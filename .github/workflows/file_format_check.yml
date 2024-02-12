@@ -14,8 +14,8 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Get changed files in pull request
-        id: get_changed_files
+      - name: Get directory based on label
+        id: get_directory
         run: |
           label_name=$(echo "${{ github.event.pull_request.labels.*.name }}" | tr -d '\n')
           if [ "$label_name" == "Calendar proposal" ]; then
@@ -23,15 +23,20 @@ jobs:
           elif [ "$label_name" == "OKR proposal" ]; then
             directory="monthly_OKR"
           fi
+          echo "Directory: $directory"
+          echo "::set-output name=DIRECTORY::$directory"
+
+      - name: Get changed files in pull request
+        id: get_changed_files
+        run: |
+          directory="${{ steps.get_directory.outputs.DIRECTORY }}"
           changed_files=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
           -X GET "${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
           | jq -r '.[] | select(.filename | contains("'"$directory"'")) | .filename')
           echo "::set-output name=CHANGED_FILES::$changed_files"
-          echo "::set-output name=DIRECTORY::$directory"
 
       - name: Check for Proposal Changes
         run: |
-          directory="${{ steps.get_changed_files.outputs.DIRECTORY }}"
           changed_files="${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
           if [ -z "$changed_files" ]; then
             echo "No changes made to the $directory directory."
