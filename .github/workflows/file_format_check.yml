@@ -9,10 +9,10 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'Calendar proposal') || contains(github.event.pull_request.labels.*.name, 'OKR proposal')
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GH_TOKEN }}
+      - name: Debug Label Name
+        run: |
+          label_name=$(echo "${{ github.event.pull_request.labels.*.name }}" | tr -d '\n')
+          echo "Label name: $label_name"
 
       - name: Get directory based on label
         id: get_directory
