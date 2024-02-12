@@ -60,7 +60,7 @@ jobs:
               # Extract month, year, and title from the filename
               file_month_year=$(echo "$filename" | cut -d'_' -f1,2)
               file_title=$(echo "$filename" | cut -d'_' -f3 | cut -d'.' -f1)
-
+              
               # Check if the month and year match the current month and year
               if [ "$file_month_year" != "$current_month_year" ]; then
                 echo "Error: File $filename does not match the current month and year."
@@ -69,6 +69,11 @@ jobs:
               # Check if the title length is within 12 characters
               if [ ${#file_title} -gt 12 ]; then
                 echo "Error: Title in $filename exceeds 12 characters."
+                exit 1
+              fi
+              # Check if the file name format is correct
+              if [[ ! "$filename" =~ ^[0-9]{2}_[0-9]{4}_[a-zA-Z0-9_]{1,11}\.md$ ]]; then
+                echo "Error: Incorrect file name format in $filename."
                 exit 1
               fi
             done <<< "$changed_files"
