@@ -6,22 +6,28 @@ on:
 
 jobs:
   check_changes:
-    if: contains(github.event.pull_request.labels.*.name, 'Calendar proposal') || contains(github.event.pull_request.labels.*.name, 'OKR proposal')
     runs-on: ubuntu-latest
     steps:
-      - name: Debug Label Name
-        run: |
-          label_name=$(echo "$(jq -r ".pull_request.labels[].name" "$GITHUB_EVENT_PATH")
-          echo "Label name: $label_name"
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
 
-      - name: Get directory based on label
-        id: get_directory
+      - name: Get label names
+        id: get_labels
         run: |
-          label_name=$(echo "${{ github.event.pull_request.labels.*.name }}" | tr -d '\n')
-          echo "Label name: $label_name"
-          if [ "$label_name" == "Calendar proposal" ]; then
+          labels=$(jq -r ".pull_request.labels | length" "$GITHUB_EVENT_PATH")
+          pr_labels=$(jq -r ".pull_request.labels[].name" "$GITHUB_EVENT_PATH")
+          echo "Labels: $pr_labels"
+          echo "::set-output name=LABELS::$pr_labels"
+
+      - name: Determine directory based on labels
+        id: determine_directory
+        run: |
+          label_names="${{ steps.get_labels.outputs.LABELS }}"
+          if [[ "$label_names" == *"Calendar proposal"* ]]; then
             directory="calender"
-          elif [ "$label_name" == "OKR proposal" ]; then
+          elif [[ "$label_names" == *"OKR proposal"* ]]; then
             directory="monthly_OKR"
           fi
           echo "Directory: $directory"
@@ -30,7 +36,7 @@ jobs:
       - name: Get changed files in pull request
         id: get_changed_files
         run: |
-          directory="${{ steps.get_directory.outputs.DIRECTORY }}"
+          directory="${{ steps.determine_directory.outputs.DIRECTORY }}"
           changed_files=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
           -X GET "${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
           | jq -r --arg directory "$directory" '.[] | select(.filename | contains($directory)) | .filename')
