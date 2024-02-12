@@ -23,6 +23,7 @@ jobs:
           elif [ "$label_name" == "OKR proposal" ]; then
             directory="monthly_OKR"
           fi
+          echo "Label name: $label_name"
           echo "Directory: $directory"
           echo "::set-output name=DIRECTORY::$directory"
 
