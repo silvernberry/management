@@ -50,5 +50,8 @@ jobs:
             exit 1
           else
             echo "Changes detected in the $directory directory."
-            echo "$changed_files"
+            while read -r file; do
+              filename=$(basename "$file")
+              echo "$filename"
+            done <<< "$changed_files"
           fi
