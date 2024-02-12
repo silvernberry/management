@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Debug Label Name
         run: |
-          label_name=$(echo "${{ github.event.pull_request.labels.*.name }}" | tr -d '\n')
+          label_name=$(echo "$(jq -r ".pull_request.labels[].name" "$GITHUB_EVENT_PATH")
           echo "Label name: $label_name"
 
       - name: Get directory based on label
